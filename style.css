@@ -1,0 +1,34 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #111;
+  cursor: pointer;
+}
+#grid {
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  user-select: none;
+}
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  contain: layout style;
+  will-change: transform;
+  transition: transform 0.3s ease-out;
+}
+#spotlight {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  background: radial-gradient(circle 700px at 50% 50%, transparent 0%, rgba(17,17,17,0.85) 100%);
+  will-change: background;
+  z-index: 1;
+}
