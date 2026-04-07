@@ -88,7 +88,7 @@ document.addEventListener('mousemove', (e) => {
 
 // Mobile
 document.addEventListener('touchstart', (e) => {
-  if (e.target === toggleBtn) return;
+  if (e.target.closest('#top-bar, #footer')) return;
   e.preventDefault();
   if (e.touches.length === 0) return;
   mouseX = e.touches[0].clientX;
@@ -97,7 +97,7 @@ document.addEventListener('touchstart', (e) => {
 }, { passive: false });
 
 document.addEventListener('touchmove', (e) => {
-  if (e.target === toggleBtn) return;
+  if (e.target.closest('#top-bar, #footer')) return;
   e.preventDefault();
   if (e.touches.length === 0) return;
   mouseX = e.touches[0].clientX;
@@ -109,7 +109,6 @@ document.addEventListener('touchmove', (e) => {
 function toggleEmoji() {
   currentEmoji = currentEmoji === EMOJI_HAND ? EMOJI_ARROW : EMOJI_HAND;
   for (const cell of cells) cell.el.textContent = currentEmoji;
-  toggleBtn.textContent = currentEmoji;
 }
 
 toggleBtn.addEventListener('click', toggleEmoji);
