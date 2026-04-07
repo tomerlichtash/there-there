@@ -5,11 +5,13 @@ html, body {
   overflow: hidden;
   background: #111;
   cursor: pointer;
+  touch-action: none;
 }
 #grid {
   display: grid;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   user-select: none;
 }
 .cell {
@@ -21,14 +23,29 @@ html, body {
   will-change: transform;
   transition: transform 0.3s ease-out;
 }
+#toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 24px;
+  cursor: pointer;
+  line-height: 1;
+}
 #spotlight {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   pointer-events: none;
   background: radial-gradient(circle 700px at 50% 50%, transparent 0%, rgba(17,17,17,0.85) 100%);
+  -webkit-backdrop-filter: none;
   will-change: background;
   z-index: 1;
 }

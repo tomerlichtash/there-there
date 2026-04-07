@@ -5,13 +5,13 @@ let currentEmoji = EMOJI_HAND;
 
 const grid = document.getElementById('grid');
 const spotlight = document.getElementById('spotlight');
+const toggleBtn = document.getElementById('toggle');
 const MIN_CELL_SIZE = 32;
 const MAX_CELLS = 500;
 
 let cols, rows, cells = [], cellSize;
 let mouseX = window.innerWidth / 2;
 let mouseY = window.innerHeight / 2;
-let rafId = null;
 
 function build() {
   const area = window.innerWidth * window.innerHeight;
@@ -43,75 +43,76 @@ function build() {
     }
   }
 
-  updateRotations();
+  updateAll();
 }
 
-const NUM_CHUNKS = 4;
-let currentChunk = 0;
-let isAnimating = false;
-
-function updateRotations() {
-  const total = cells.length;
-  const chunkSize = Math.ceil(total / NUM_CHUNKS);
-  const start = currentChunk * chunkSize;
-  const end = Math.min(start + chunkSize, total);
-
-  for (let i = start; i < end; i++) {
+function updateAll() {
+  for (let i = 0; i < cells.length; i++) {
     const cell = cells[i];
     const dx = mouseX - cell.x;
     const dy = mouseY - cell.y;
     const angle = Math.atan2(dy, dx) * (180 / Math.PI);
     cell.el.style.transform = `rotate(${angle}deg)`;
   }
+}
 
-  currentChunk = (currentChunk + 1) % NUM_CHUNKS;
-
-  if (isAnimating) {
-    rafId = requestAnimationFrame(updateRotations);
-  } else {
-    rafId = null;
-  }
+function getSpotlightRadius() {
+  return Math.min(window.innerWidth, window.innerHeight) * 0.8;
 }
 
 function updateSpotlight() {
+  const r = getSpotlightRadius();
   spotlight.style.background =
-    `radial-gradient(circle 700px at ${mouseX}px ${mouseY}px, transparent 0%, rgba(17,17,17,0.85) 100%)`;
+    `radial-gradient(${r}px circle at ${mouseX}px ${mouseY}px, transparent 0%, rgba(17,17,17,0.85) 100%)`;
 }
 
-function startAnimating() {
-  isAnimating = true;
-  if (!rafId) {
-    rafId = requestAnimationFrame(updateRotations);
+let rafPending = false;
+
+function scheduleUpdate() {
+  updateSpotlight();
+  if (!rafPending) {
+    rafPending = true;
+    requestAnimationFrame(() => {
+      rafPending = false;
+      updateAll();
+    });
   }
 }
 
-let idleTimer = null;
-function resetIdle() {
-  clearTimeout(idleTimer);
-  idleTimer = setTimeout(() => { isAnimating = false; }, 200);
-}
-
+// Desktop
 document.addEventListener('mousemove', (e) => {
   mouseX = e.clientX;
   mouseY = e.clientY;
-  updateSpotlight();
-  startAnimating();
-  resetIdle();
+  scheduleUpdate();
 });
 
-document.addEventListener('touchmove', (e) => {
+// Mobile
+document.addEventListener('touchstart', (e) => {
+  if (e.target === toggleBtn) return;
   e.preventDefault();
+  if (e.touches.length === 0) return;
   mouseX = e.touches[0].clientX;
   mouseY = e.touches[0].clientY;
-  updateSpotlight();
-  startAnimating();
-  resetIdle();
+  scheduleUpdate();
 }, { passive: false });
 
-document.addEventListener('click', () => {
+document.addEventListener('touchmove', (e) => {
+  if (e.target === toggleBtn) return;
+  e.preventDefault();
+  if (e.touches.length === 0) return;
+  mouseX = e.touches[0].clientX;
+  mouseY = e.touches[0].clientY;
+  scheduleUpdate();
+}, { passive: false });
+
+// Toggle
+function toggleEmoji() {
   currentEmoji = currentEmoji === EMOJI_HAND ? EMOJI_ARROW : EMOJI_HAND;
   for (const cell of cells) cell.el.textContent = currentEmoji;
-});
+  toggleBtn.textContent = currentEmoji;
+}
+
+toggleBtn.addEventListener('click', toggleEmoji);
 
 window.addEventListener('resize', build);
 updateSpotlight();
